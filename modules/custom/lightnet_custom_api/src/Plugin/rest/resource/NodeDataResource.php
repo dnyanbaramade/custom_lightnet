@@ -17,7 +17,7 @@ use Drupal\Core\Session\AccountProxyInterface;
  *   id = "lightnet_node_data_resource",
  *   label = @Translation("Lightnet Node Data API"),
  *   uri_paths = {
- *     "canonical" = "/api/v1/node-data/{nid}",
+ *     "canonical" = "/api/v1/node-data/{identifier}",
  *     "create" = "/api/v1/node-data"
  *   }
  * )
@@ -54,16 +54,17 @@ class NodeDataResource extends ResourceBase {
   }
 
   /**
-   * GET: Fetch node data.
+   * GET: Fetch node by NID or Alias.
    */
-  public function get($nid) {
+  public function get($identifier) {
+
     if (!$this->currentUser->hasPermission('access lightnet node api')) {
       throw new AccessDeniedHttpException();
     }
 
-    $data = $this->nodeDataService->getNodeData((int) $nid);
+    $result = $this->nodeDataService->getNodeDataByIdentifier($identifier);
 
-    if (!$data) {
+    if (!$result) {
       return new ResourceResponse([
         'status' => 'error',
         'code' => 404,
@@ -71,34 +72,50 @@ class NodeDataResource extends ResourceBase {
       ], 404);
     }
 
-    return new ResourceResponse([
+    $response = new ResourceResponse([
       'status' => 'success',
       'code' => 200,
       'message' => 'Node fetched successfully',
-      'data' => $data,
+      'data' => $result['data'],
     ], 200);
+
+    // 🔥 Drupal-level cache metadata
+    $response->addCacheableDependency($result['node']);
+    $response->getCacheableMetadata()
+      ->setCacheContexts(['url', 'user.permissions'])
+      ->setCacheMaxAge(3600);
+
+    return $response;
   }
 
   /**
    * POST: Create node.
    */
   public function post(Request $request) {
+
     if (!$this->currentUser->hasPermission('access lightnet node api')) {
       throw new AccessDeniedHttpException();
     }
 
     try {
-      $payload = json_decode($request->getContent(), TRUE);
-      $node = $this->nodeDataService->createNode($payload);
 
-      return new ResourceResponse([
+      $payload = json_decode($request->getContent(), TRUE);
+      $result = $this->nodeDataService->createNode($payload);
+
+      $response = new ResourceResponse([
         'status' => 'success',
         'code' => 201,
         'message' => 'Node created successfully',
-        'data' => $node,
+        'data' => $result['data'],
       ], 201);
 
+      // Invalidate cache for this node
+      $response->addCacheableDependency($result['node']);
+
+      return $response;
+
     } catch (\Exception $e) {
+
       return new ResourceResponse([
         'status' => 'error',
         'code' => 400,
