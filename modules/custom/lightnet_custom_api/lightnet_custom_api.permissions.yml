@@ -1,0 +1,3 @@
+access lightnet node api:
+  title: 'Access Lightnet Node API'
+  description: 'Allow users to access Lightnet custom REST APIs'

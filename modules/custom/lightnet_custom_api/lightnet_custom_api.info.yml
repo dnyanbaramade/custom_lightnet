@@ -1,0 +1,8 @@
+name: Lightnet Custom API
+type: module
+description: Custom REST API to fetch node data
+core_version_requirement: ^10
+package: Custom
+dependencies:
+  - drupal:rest
+  - drupal:serialization

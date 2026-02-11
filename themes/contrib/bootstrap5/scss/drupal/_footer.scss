@@ -1,0 +1,16 @@
+footer {
+  padding: $footer-padding;
+
+  &.footer-dark {
+    @include b5-make-link($light, none, $light, none);
+  }
+
+  .region-footer {
+    display: flex;
+    gap: 40px;
+    @media screen and (max-width: 767px) {
+      flex-direction: column;
+      gap: 30px;
+    }
+  }
+}
