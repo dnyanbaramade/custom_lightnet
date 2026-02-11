@@ -105,6 +105,10 @@ class ComposerStaticInitfdb267e3558ca35b5dfe5d7250b36e07
             'Grasmash\\YamlCli\\' => 17,
             'Grasmash\\Expander\\' => 18,
         ),
+        'F' =>
+        array (
+            'Firebase\\JWT\\' => 13,
+        ),
         'E' =>
         array (
             'Egulias\\EmailValidator\\' => 23,
@@ -345,6 +349,10 @@ class ComposerStaticInitfdb267e3558ca35b5dfe5d7250b36e07
         'Grasmash\\Expander\\' =>
         array (
             0 => __DIR__ . '/..' . '/grasmash/expander/src',
+        ),
+        'Firebase\\JWT\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/firebase/php-jwt/src',
         ),
         'Egulias\\EmailValidator\\' =>
         array (
